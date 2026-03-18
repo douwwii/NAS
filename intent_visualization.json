@@ -1,0 +1,388 @@
+{
+  "provider": {
+    "name": "AS-PROVIDER",
+    "asnumber": 65000,
+    "igp": "OSPF",
+    "ospf_process": 1,
+    "ospf_area": 0
+  },
+  "address_pools": {
+    "core_links_v4": "10.0.0.0/24",
+    "loopbacks_v4": "1.1.1.0/24",
+    "pe_ce_links_v4": "172.16.0.0/24",
+    "customer_lans_v4": "192.168.0.0/16"
+  },
+  "routers": {
+    "PE1": {
+      "role": "PE",
+      "addresses": [
+        {
+          "interface": "Loopback0",
+          "type": "loopback",
+          "ip": "1.1.1.1",
+          "mask": "255.255.255.255",
+          "network": "1.1.1.1/32"
+        },
+        {
+          "interface": "GigabitEthernet1/0",
+          "type": "core",
+          "peer": "P1",
+          "ip": "10.0.0.1",
+          "mask": "255.255.255.252",
+          "network": "10.0.0.0/30"
+        },
+        {
+          "interface": "GigabitEthernet2/0",
+          "type": "pe-ce",
+          "peer": "CE1",
+          "vrf": "CUST1",
+          "ip": "172.16.0.1",
+          "mask": "255.255.255.252",
+          "network": "172.16.0.0/30"
+        },
+        {
+          "interface": "GigabitEthernet3/0",
+          "type": "pe-ce",
+          "peer": "CE3",
+          "vrf": "CUST2",
+          "ip": "172.16.0.9",
+          "mask": "255.255.255.252",
+          "network": "172.16.0.8/30"
+        }
+      ],
+      "routeurID": "1.1.1.1"
+    },
+    "P1": {
+      "role": "P",
+      "addresses": [
+        {
+          "interface": "Loopback0",
+          "type": "loopback",
+          "ip": "1.1.1.2",
+          "mask": "255.255.255.255",
+          "network": "1.1.1.2/32"
+        },
+        {
+          "interface": "GigabitEthernet1/0",
+          "type": "core",
+          "peer": "PE1",
+          "ip": "10.0.0.2",
+          "mask": "255.255.255.252",
+          "network": "10.0.0.0/30"
+        },
+        {
+          "interface": "GigabitEthernet2/0",
+          "type": "core",
+          "peer": "P2",
+          "ip": "10.0.0.5",
+          "mask": "255.255.255.252",
+          "network": "10.0.0.4/30"
+        }
+      ],
+      "routeurID": "2.2.2.2"
+    },
+    "P2": {
+      "role": "P",
+      "addresses": [
+        {
+          "interface": "Loopback0",
+          "type": "loopback",
+          "ip": "1.1.1.3",
+          "mask": "255.255.255.255",
+          "network": "1.1.1.3/32"
+        },
+        {
+          "interface": "GigabitEthernet1/0",
+          "type": "core",
+          "peer": "P1",
+          "ip": "10.0.0.6",
+          "mask": "255.255.255.252",
+          "network": "10.0.0.4/30"
+        },
+        {
+          "interface": "GigabitEthernet2/0",
+          "type": "core",
+          "peer": "PE2",
+          "ip": "10.0.0.9",
+          "mask": "255.255.255.252",
+          "network": "10.0.0.8/30"
+        }
+      ],
+      "routeurID": "3.3.3.3"
+    },
+    "PE2": {
+      "role": "PE",
+      "addresses": [
+        {
+          "interface": "Loopback0",
+          "type": "loopback",
+          "ip": "1.1.1.4",
+          "mask": "255.255.255.255",
+          "network": "1.1.1.4/32"
+        },
+        {
+          "interface": "GigabitEthernet1/0",
+          "type": "core",
+          "peer": "P2",
+          "ip": "10.0.0.10",
+          "mask": "255.255.255.252",
+          "network": "10.0.0.8/30"
+        },
+        {
+          "interface": "GigabitEthernet2/0",
+          "type": "pe-ce",
+          "peer": "CE2",
+          "vrf": "CUST1",
+          "ip": "172.16.0.5",
+          "mask": "255.255.255.252",
+          "network": "172.16.0.4/30"
+        },
+        {
+          "interface": "GigabitEthernet3/0",
+          "type": "pe-ce",
+          "peer": "CE4",
+          "vrf": "CUST2",
+          "ip": "172.16.0.13",
+          "mask": "255.255.255.252",
+          "network": "172.16.0.12/30"
+        }
+      ],
+      "routeurID": "4.4.4.4"
+    },
+    "CE1": {
+      "role": "CE",
+      "addresses": [
+        {
+          "interface": "GigabitEthernet1/0",
+          "type": "pe-ce",
+          "peer": "PE1",
+          "vrf": "CUST1",
+          "ip": "172.16.0.2",
+          "mask": "255.255.255.252",
+          "network": "172.16.0.0/30"
+        },
+        {
+          "interface": "GigabitEthernet2/0",
+          "type": "customer-lan",
+          "customer": "CUST1",
+          "ip": "192.168.10.1",
+          "mask": "255.255.255.0",
+          "network": "192.168.10.0/24"
+        }
+      ],
+      "customer": "CUST1",
+      "ce_as": 65101
+    },
+    "CE2": {
+      "role": "CE",
+      "addresses": [
+        {
+          "interface": "GigabitEthernet1/0",
+          "type": "pe-ce",
+          "peer": "PE2",
+          "vrf": "CUST1",
+          "ip": "172.16.0.6",
+          "mask": "255.255.255.252",
+          "network": "172.16.0.4/30"
+        },
+        {
+          "interface": "GigabitEthernet2/0",
+          "type": "customer-lan",
+          "customer": "CUST1",
+          "ip": "192.168.11.1",
+          "mask": "255.255.255.0",
+          "network": "192.168.11.0/24"
+        }
+      ],
+      "customer": "CUST1",
+      "ce_as": 65102
+    },
+    "CE3": {
+      "role": "CE",
+      "addresses": [
+        {
+          "interface": "GigabitEthernet1/0",
+          "type": "pe-ce",
+          "peer": "PE1",
+          "vrf": "CUST2",
+          "ip": "172.16.0.10",
+          "mask": "255.255.255.252",
+          "network": "172.16.0.8/30"
+        },
+        {
+          "interface": "GigabitEthernet2/0",
+          "type": "customer-lan",
+          "customer": "CUST2",
+          "ip": "192.168.20.1",
+          "mask": "255.255.255.0",
+          "network": "192.168.20.0/24"
+        }
+      ],
+      "customer": "CUST2",
+      "ce_as": 65201
+    },
+    "CE4": {
+      "role": "CE",
+      "addresses": [
+        {
+          "interface": "GigabitEthernet1/0",
+          "type": "pe-ce",
+          "peer": "PE2",
+          "vrf": "CUST2",
+          "ip": "172.16.0.14",
+          "mask": "255.255.255.252",
+          "network": "172.16.0.12/30"
+        },
+        {
+          "interface": "GigabitEthernet2/0",
+          "type": "customer-lan",
+          "customer": "CUST2",
+          "ip": "192.168.21.1",
+          "mask": "255.255.255.0",
+          "network": "192.168.21.0/24"
+        }
+      ],
+      "customer": "CUST2",
+      "ce_as": 65202
+    }
+  },
+  "links": [
+    {
+      "type": "core",
+      "link_id": 0,
+      "network": "10.0.0.0/30",
+      "endpoints": [
+        {
+          "router": "PE1",
+          "interface": "GigabitEthernet1/0",
+          "ip": "10.0.0.1",
+          "mask": "255.255.255.252"
+        },
+        {
+          "router": "P1",
+          "interface": "GigabitEthernet1/0",
+          "ip": "10.0.0.2",
+          "mask": "255.255.255.252"
+        }
+      ]
+    },
+    {
+      "type": "core",
+      "link_id": 1,
+      "network": "10.0.0.4/30",
+      "endpoints": [
+        {
+          "router": "P1",
+          "interface": "GigabitEthernet2/0",
+          "ip": "10.0.0.5",
+          "mask": "255.255.255.252"
+        },
+        {
+          "router": "P2",
+          "interface": "GigabitEthernet1/0",
+          "ip": "10.0.0.6",
+          "mask": "255.255.255.252"
+        }
+      ]
+    },
+    {
+      "type": "core",
+      "link_id": 2,
+      "network": "10.0.0.8/30",
+      "endpoints": [
+        {
+          "router": "P2",
+          "interface": "GigabitEthernet2/0",
+          "ip": "10.0.0.9",
+          "mask": "255.255.255.252"
+        },
+        {
+          "router": "PE2",
+          "interface": "GigabitEthernet1/0",
+          "ip": "10.0.0.10",
+          "mask": "255.255.255.252"
+        }
+      ]
+    },
+    {
+      "type": "pe-ce",
+      "link_id": 100,
+      "vrf": "CUST1",
+      "network": "172.16.0.0/30",
+      "endpoints": [
+        {
+          "router": "PE1",
+          "interface": "GigabitEthernet2/0",
+          "ip": "172.16.0.1",
+          "mask": "255.255.255.252"
+        },
+        {
+          "router": "CE1",
+          "interface": "GigabitEthernet1/0",
+          "ip": "172.16.0.2",
+          "mask": "255.255.255.252"
+        }
+      ]
+    },
+    {
+      "type": "pe-ce",
+      "link_id": 101,
+      "vrf": "CUST1",
+      "network": "172.16.0.4/30",
+      "endpoints": [
+        {
+          "router": "PE2",
+          "interface": "GigabitEthernet2/0",
+          "ip": "172.16.0.5",
+          "mask": "255.255.255.252"
+        },
+        {
+          "router": "CE2",
+          "interface": "GigabitEthernet1/0",
+          "ip": "172.16.0.6",
+          "mask": "255.255.255.252"
+        }
+      ]
+    },
+    {
+      "type": "pe-ce",
+      "link_id": 102,
+      "vrf": "CUST2",
+      "network": "172.16.0.8/30",
+      "endpoints": [
+        {
+          "router": "PE1",
+          "interface": "GigabitEthernet3/0",
+          "ip": "172.16.0.9",
+          "mask": "255.255.255.252"
+        },
+        {
+          "router": "CE3",
+          "interface": "GigabitEthernet1/0",
+          "ip": "172.16.0.10",
+          "mask": "255.255.255.252"
+        }
+      ]
+    },
+    {
+      "type": "pe-ce",
+      "link_id": 103,
+      "vrf": "CUST2",
+      "network": "172.16.0.12/30",
+      "endpoints": [
+        {
+          "router": "PE2",
+          "interface": "GigabitEthernet3/0",
+          "ip": "172.16.0.13",
+          "mask": "255.255.255.252"
+        },
+        {
+          "router": "CE4",
+          "interface": "GigabitEthernet1/0",
+          "ip": "172.16.0.14",
+          "mask": "255.255.255.252"
+        }
+      ]
+    }
+  ]
+}
