@@ -74,9 +74,9 @@
   "links": [
     {
       "routeur_a": "PE1",
-      "interface_a": "GigabitEthernet0/0",
+      "interface_a": "GigabitEthernet1/0",
       "routeur_b": "P1",
-      "interface_b": "GigabitEthernet0/0",
+      "interface_b": "GigabitEthernet1/0",
       "link_id": 0,
       "type": "core",
       "ospf": true,
@@ -84,9 +84,9 @@
     },
     {
       "routeur_a": "P1",
-      "interface_a": "GigabitEthernet0/1",
+      "interface_a": "GigabitEthernet2/0",
       "routeur_b": "P2",
-      "interface_b": "GigabitEthernet0/0",
+      "interface_b": "GigabitEthernet1/0",
       "link_id": 1,
       "type": "core",
       "ospf": true,
@@ -94,9 +94,9 @@
     },
     {
       "routeur_a": "P2",
-      "interface_a": "GigabitEthernet0/1",
+      "interface_a": "GigabitEthernet2/0",
       "routeur_b": "PE2",
-      "interface_b": "GigabitEthernet0/0",
+      "interface_b": "GigabitEthernet1/0",
       "link_id": 2,
       "type": "core",
       "ospf": true,
@@ -105,9 +105,9 @@
 
     {
       "routeur_a": "PE1",
-      "interface_a": "GigabitEthernet1/0",
+      "interface_a": "GigabitEthernet2/0",
       "routeur_b": "CE1",
-      "interface_b": "GigabitEthernet0/0",
+      "interface_b": "Ethernet0",
       "link_id": 100,
       "type": "pe-ce",
       "vrf": "CUST1",
@@ -115,9 +115,9 @@
     },
     {
       "routeur_a": "PE2",
-      "interface_a": "GigabitEthernet1/0",
+      "interface_a": "GigabitEthernet2/0",
       "routeur_b": "CE2",
-      "interface_b": "GigabitEthernet0/0",
+      "interface_b": "Ethernet0",
       "link_id": 101,
       "type": "pe-ce",
       "vrf": "CUST1",
@@ -125,9 +125,9 @@
     },
     {
       "routeur_a": "PE1",
-      "interface_a": "GigabitEthernet1/1",
+      "interface_a": "GigabitEthernet3/0",
       "routeur_b": "CE3",
-      "interface_b": "GigabitEthernet0/0",
+      "interface_b": "Ethernet0",
       "link_id": 102,
       "type": "pe-ce",
       "vrf": "CUST2",
@@ -135,9 +135,9 @@
     },
     {
       "routeur_a": "PE2",
-      "interface_a": "GigabitEthernet1/1",
+      "interface_a": "GigabitEthernet3/0",
       "routeur_b": "CE4",
-      "interface_b": "GigabitEthernet0/0",
+      "interface_b": "Ethernet0",
       "link_id": 103,
       "type": "pe-ce",
       "vrf": "CUST2",
