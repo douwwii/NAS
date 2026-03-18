@@ -1,0 +1,183 @@
+{
+  "provider": {
+    "name": "AS-PROVIDER",
+    "asnumber": 65000,
+    "igp": "OSPF",
+    "ospf_process": 1,
+    "ospf_area": 0
+  },
+
+  "address_pools": {
+    "core_links_v4": "10.0.0.0/24",
+    "loopbacks_v4": "1.1.1.0/24",
+    "pe_ce_links_v4": "172.16.0.0/24",
+    "customer_lans_v4": "192.168.0.0/16"
+  },
+
+  "mpls": {
+    "enabled": true,
+    "label_protocol": "LDP",
+    "ldp_router_id_source": "Loopback0"
+  },
+
+  "bgp": {
+    "enabled": true,
+    "provider_as": 65000,
+    "vpnv4": true,
+    "neighbors_use_loopback": true
+  },
+
+  "routeurs": {
+    "PE1": {
+      "role": "PE",
+      "routeurID": "1.1.1.1",
+      "loopback_index": 1
+    },
+    "P1": {
+      "role": "P",
+      "routeurID": "2.2.2.2",
+      "loopback_index": 2
+    },
+    "P2": {
+      "role": "P",
+      "routeurID": "3.3.3.3",
+      "loopback_index": 3
+    },
+    "PE2": {
+      "role": "PE",
+      "routeurID": "4.4.4.4",
+      "loopback_index": 4
+    },
+
+    "CE1": {
+      "role": "CE",
+      "customer": "CUST1",
+      "ce_as": 65101
+    },
+    "CE2": {
+      "role": "CE",
+      "customer": "CUST1",
+      "ce_as": 65102
+    },
+    "CE3": {
+      "role": "CE",
+      "customer": "CUST2",
+      "ce_as": 65201
+    },
+    "CE4": {
+      "role": "CE",
+      "customer": "CUST2",
+      "ce_as": 65202
+    }
+  },
+
+  "links": [
+    {
+      "routeur_a": "PE1",
+      "interface_a": "GigabitEthernet0/0",
+      "routeur_b": "P1",
+      "interface_b": "GigabitEthernet0/0",
+      "link_id": 0,
+      "type": "core",
+      "ospf": true,
+      "mpls": true
+    },
+    {
+      "routeur_a": "P1",
+      "interface_a": "GigabitEthernet0/1",
+      "routeur_b": "P2",
+      "interface_b": "GigabitEthernet0/0",
+      "link_id": 1,
+      "type": "core",
+      "ospf": true,
+      "mpls": true
+    },
+    {
+      "routeur_a": "P2",
+      "interface_a": "GigabitEthernet0/1",
+      "routeur_b": "PE2",
+      "interface_b": "GigabitEthernet0/0",
+      "link_id": 2,
+      "type": "core",
+      "ospf": true,
+      "mpls": true
+    },
+
+    {
+      "routeur_a": "PE1",
+      "interface_a": "GigabitEthernet1/0",
+      "routeur_b": "CE1",
+      "interface_b": "GigabitEthernet0/0",
+      "link_id": 100,
+      "type": "pe-ce",
+      "vrf": "CUST1",
+      "routing": "ebgp"
+    },
+    {
+      "routeur_a": "PE2",
+      "interface_a": "GigabitEthernet1/0",
+      "routeur_b": "CE2",
+      "interface_b": "GigabitEthernet0/0",
+      "link_id": 101,
+      "type": "pe-ce",
+      "vrf": "CUST1",
+      "routing": "ebgp"
+    },
+    {
+      "routeur_a": "PE1",
+      "interface_a": "GigabitEthernet1/1",
+      "routeur_b": "CE3",
+      "interface_b": "GigabitEthernet0/0",
+      "link_id": 102,
+      "type": "pe-ce",
+      "vrf": "CUST2",
+      "routing": "ebgp"
+    },
+    {
+      "routeur_a": "PE2",
+      "interface_a": "GigabitEthernet1/1",
+      "routeur_b": "CE4",
+      "interface_b": "GigabitEthernet0/0",
+      "link_id": 103,
+      "type": "pe-ce",
+      "vrf": "CUST2",
+      "routing": "ebgp"
+    }
+  ],
+
+  "vrfs": {
+    "CUST1": {
+      "rd": "65000:1",
+      "rt_import": ["65000:1"],
+      "rt_export": ["65000:1"]
+    },
+    "CUST2": {
+      "rd": "65000:2",
+      "rt_import": ["65000:2"],
+      "rt_export": ["65000:2"]
+    }
+  },
+
+  "customer_sites": {
+    "CUST1": [
+      {
+        "ce": "CE1",
+        "lan_prefix": "192.168.10.0/24"
+      },
+      {
+        "ce": "CE2",
+        "lan_prefix": "192.168.11.0/24"
+      }
+    ],
+    "CUST2": [
+      {
+        "ce": "CE3",
+        "lan_prefix": "192.168.20.0/24"
+      },
+      {
+        "ce": "CE4",
+        "lan_prefix": "192.168.21.0/24"
+      }
+    ]
+  }
+}
