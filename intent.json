@@ -107,7 +107,11 @@
       "routeur_a": "PE1",
       "interface_a": "GigabitEthernet2/0",
       "routeur_b": "CE1",
+<<<<<<< HEAD
       "interface_b": "Ethernet0",
+=======
+      "interface_b": "GigabitEthernet1/0",
+>>>>>>> e1dd316a096277b489ccbb8bd15ff642796e9ea8
       "link_id": 100,
       "type": "pe-ce",
       "vrf": "CUST1",
@@ -117,7 +121,11 @@
       "routeur_a": "PE2",
       "interface_a": "GigabitEthernet2/0",
       "routeur_b": "CE2",
+<<<<<<< HEAD
       "interface_b": "Ethernet0",
+=======
+      "interface_b": "GigabitEthernet1/0",
+>>>>>>> e1dd316a096277b489ccbb8bd15ff642796e9ea8
       "link_id": 101,
       "type": "pe-ce",
       "vrf": "CUST1",
@@ -127,7 +135,11 @@
       "routeur_a": "PE1",
       "interface_a": "GigabitEthernet3/0",
       "routeur_b": "CE3",
+<<<<<<< HEAD
       "interface_b": "Ethernet0",
+=======
+      "interface_b": "GigabitEthernet1/0",
+>>>>>>> e1dd316a096277b489ccbb8bd15ff642796e9ea8
       "link_id": 102,
       "type": "pe-ce",
       "vrf": "CUST2",
@@ -137,7 +149,11 @@
       "routeur_a": "PE2",
       "interface_a": "GigabitEthernet3/0",
       "routeur_b": "CE4",
+<<<<<<< HEAD
       "interface_b": "Ethernet0",
+=======
+      "interface_b": "GigabitEthernet1/0",
+>>>>>>> e1dd316a096277b489ccbb8bd15ff642796e9ea8
       "link_id": 103,
       "type": "pe-ce",
       "vrf": "CUST2",
@@ -162,21 +178,25 @@
     "CUST1": [
       {
         "ce": "CE1",
-        "lan_prefix": "192.168.10.0/24"
+        "lan_prefix": "192.168.10.0/24",
+        "lan_interface": "GigabitEthernet2/0"
       },
       {
         "ce": "CE2",
-        "lan_prefix": "192.168.11.0/24"
+        "lan_prefix": "192.168.11.0/24",
+        "lan_interface": "GigabitEthernet2/0"
       }
     ],
     "CUST2": [
       {
         "ce": "CE3",
-        "lan_prefix": "192.168.20.0/24"
+        "lan_prefix": "192.168.20.0/24",
+        "lan_interface": "GigabitEthernet2/0"
       },
       {
         "ce": "CE4",
-        "lan_prefix": "192.168.21.0/24"
+        "lan_prefix": "192.168.21.0/24",
+        "lan_interface": "GigabitEthernet2/0"
       }
     ]
   }
