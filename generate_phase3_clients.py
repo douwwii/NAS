@@ -1,7 +1,10 @@
+import ipaddress
+
 from config_common import (
     GENERATED_DIR,
     add_interface_block,
     ce_routers,
+    get_ce_loopbacks,
     get_customer_lans,
     get_pe_ce_allocations,
     load_intent,
@@ -39,6 +42,7 @@ def append_vrf_definition(lines: list[str], vrf_name: str, vrf_data: dict) -> No
 def build_phase3_configs(intent: dict) -> dict[str, list[str]]:
     provider_as = intent["bgp"]["provider_as"]
     customer_lans = get_customer_lans(intent)
+    ce_loopbacks = get_ce_loopbacks(intent)
     customer_sites = get_customer_site_by_ce(intent)
     pe_ce_allocations = get_pe_ce_allocations(intent)
 
@@ -105,14 +109,29 @@ def build_phase3_configs(intent: dict) -> dict[str, list[str]]:
             customer_lans[router_name]["ip"],
             customer_lans[router_name]["mask"],
         )
+        if router_name in ce_loopbacks:
+            add_interface_block(
+                lines,
+                ce_loopbacks[router_name]["interface"],
+                "Customer Loopback",
+                ce_loopbacks[router_name]["ip"],
+                ce_loopbacks[router_name]["mask"],
+            )
         lines.extend(
             [
                 f"router bgp {router_data['ce_as']}",
-                f" bgp router-id {customer_lans[router_name]['ip']}",
+                f" bgp router-id {ce_loopbacks[router_name]['ip'] if router_name in ce_loopbacks else customer_lans[router_name]['ip']}",
                 f" neighbor {allocation['pe_ip']} remote-as {provider_as}",
                 " address-family ipv4",
                 f"  neighbor {allocation['pe_ip']} activate",
                 f"  network {customer_lans[router_name]['network'].network_address} mask {customer_lans[router_name]['mask']}",
+                *(
+                    [
+                        f"  network {ipaddress.ip_network(ce_loopbacks[router_name]['network']).network_address} mask {ce_loopbacks[router_name]['mask']}"
+                    ]
+                    if router_name in ce_loopbacks
+                    else []
+                ),
                 " exit-address-family",
                 "!",
                 "end",

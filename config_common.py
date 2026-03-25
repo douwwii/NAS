@@ -47,9 +47,13 @@ def wildcard_mask(network: ipaddress.IPv4Network) -> str:
     return str(ipaddress.IPv4Address(int(network.hostmask)))
 
 
-def loopback_ip(pool: str, index: int) -> tuple[str, str]:
+def loopback_ip(pool: str, index: int) -> tuple[str, str, str]:
     network = ipaddress.ip_network(pool)
-    return str(network.network_address + index), "255.255.255.255"
+    subnets = list(network.subnets(new_prefix=30))
+    if index <= 0 or index > len(subnets):
+        raise ValueError(f"Loopback index {index} is out of range for pool {pool}")
+    subnet = subnets[index - 1]
+    return host_ip(subnet, 1), render_mask(subnet), str(subnet)
 
 
 def get_loopbacks(intent: dict) -> dict[str, dict]:
@@ -58,12 +62,28 @@ def get_loopbacks(intent: dict) -> dict[str, dict]:
     for router_name, router_data in intent["routeurs"].items():
         if "loopback_index" not in router_data:
             continue
-        address, mask = loopback_ip(pool, router_data["loopback_index"])
+        address, mask, subnet = loopback_ip(pool, router_data["loopback_index"])
         loopbacks[router_name] = {
             "interface": "Loopback0",
             "ip": address,
             "mask": mask,
-            "network": f"{address}/32",
+            "network": subnet,
+        }
+    return loopbacks
+
+
+def get_ce_loopbacks(intent: dict) -> dict[str, dict]:
+    pool = intent["address_pools"]["customer_loopbacks_v4"]
+    loopbacks: dict[str, dict] = {}
+    for router_name, router_data in intent["routeurs"].items():
+        if "ce_loopback_index" not in router_data:
+            continue
+        address, mask, subnet = loopback_ip(pool, router_data["ce_loopback_index"])
+        loopbacks[router_name] = {
+            "interface": "Loopback0",
+            "ip": address,
+            "mask": mask,
+            "network": subnet,
         }
     return loopbacks
 
@@ -183,6 +203,7 @@ def write_router_configs(configs: dict[str, list[str]], output_dir: Path, suffix
 
 
 def build_visualization_intent(intent: dict) -> dict:
+    provider_loopbacks = get_loopbacks(intent)
     visualization = {
         "provider": intent["provider"],
         "address_pools": intent["address_pools"],
@@ -199,10 +220,23 @@ def build_visualization_intent(intent: dict) -> dict:
             visualization["routers"][router_name]["customer"] = router_data["customer"]
         if "ce_as" in router_data:
             visualization["routers"][router_name]["ce_as"] = router_data["ce_as"]
-        if "routeurID" in router_data:
+        if router_name in provider_loopbacks:
+            visualization["routers"][router_name]["routeurID"] = provider_loopbacks[router_name]["ip"]
+        elif "routeurID" in router_data:
             visualization["routers"][router_name]["routeurID"] = router_data["routeurID"]
 
-    for router_name, loopback in get_loopbacks(intent).items():
+    for router_name, loopback in provider_loopbacks.items():
+        visualization["routers"][router_name]["addresses"].append(
+            {
+                "interface": loopback["interface"],
+                "type": "loopback",
+                "ip": loopback["ip"],
+                "mask": loopback["mask"],
+                "network": loopback["network"],
+            }
+        )
+
+    for router_name, loopback in get_ce_loopbacks(intent).items():
         visualization["routers"][router_name]["addresses"].append(
             {
                 "interface": loopback["interface"],

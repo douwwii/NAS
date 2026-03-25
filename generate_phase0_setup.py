@@ -24,11 +24,10 @@ def build_phase0_configs(intent: dict) -> dict[str, list[str]]:
     for router_name, loopback in loopbacks.items():
         if router_name not in configs:
             continue
-        router_id = intent["routeurs"][router_name]["routeurID"]
         add_interface_block(
             configs[router_name],
             loopback["interface"],
-            f"Router-ID {router_id}",
+            f"Router-ID {loopback['ip']}",
             loopback["ip"],
             loopback["mask"],
         )
@@ -51,11 +50,10 @@ def build_phase0_configs(intent: dict) -> dict[str, list[str]]:
         )
 
     for router_name in configs:
-        router_data = intent["routeurs"][router_name]
         configs[router_name].extend(
             [
                 f"router ospf {process_id}",
-                f" router-id {router_data['routeurID']}",
+                f" router-id {loopbacks[router_name]['ip']}",
                 " passive-interface Loopback0",
                 f" network {loopbacks[router_name]['ip']} 0.0.0.0 area {area}",
             ]
