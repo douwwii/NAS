@@ -12,7 +12,7 @@ def build_phase2_configs(intent: dict) -> dict[str, list[str]]:
         lines.extend(
             [
                 f"router bgp {provider_as}",
-                f" bgp router-id {intent['routeurs'][router_name]['routeurID']}",
+                f" bgp router-id {loopbacks[router_name]['ip']}",
                 " no bgp default ipv4-unicast",
             ]
         )

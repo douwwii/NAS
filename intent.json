@@ -9,7 +9,8 @@
 
   "address_pools": {
     "core_links_v4": "10.0.0.0/24",
-    "loopbacks_v4": "1.1.1.0/24",
+    "loopbacks_v4": "10.255.255.0/24",
+    "customer_loopbacks_v4": "10.255.254.0/24",
     "pe_ce_links_v4": "172.16.0.0/24",
     "customer_lans_v4": "192.168.0.0/16"
   },
@@ -30,44 +31,48 @@
   "routeurs": {
     "PE1": {
       "role": "PE",
-      "routeurID": "1.1.1.1",
+      "routeurID": "10.255.255.1",
       "loopback_index": 1
     },
     "P1": {
       "role": "P",
-      "routeurID": "2.2.2.2",
+      "routeurID": "10.255.255.2",
       "loopback_index": 2
     },
     "P2": {
       "role": "P",
-      "routeurID": "3.3.3.3",
+      "routeurID": "10.255.255.3",
       "loopback_index": 3
     },
     "PE2": {
       "role": "PE",
-      "routeurID": "4.4.4.4",
+      "routeurID": "10.255.255.4",
       "loopback_index": 4
     },
 
     "CE1": {
       "role": "CE",
       "customer": "CUST1",
-      "ce_as": 65101
+      "ce_as": 65101,
+      "ce_loopback_index": 1
     },
     "CE2": {
       "role": "CE",
       "customer": "CUST1",
-      "ce_as": 65102
+      "ce_as": 65102,
+      "ce_loopback_index": 2
     },
     "CE3": {
       "role": "CE",
       "customer": "CUST2",
-      "ce_as": 65201
+      "ce_as": 65201,
+      "ce_loopback_index": 3
     },
     "CE4": {
       "role": "CE",
       "customer": "CUST2",
-      "ce_as": 65202
+      "ce_as": 65202,
+      "ce_loopback_index": 4
     }
   },
 
