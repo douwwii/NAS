@@ -13,7 +13,8 @@ def name_contains(filename: str, patterns: tuple[str, ...]) -> bool:
 def clean_dynamips_configs(project_root: Path) -> None:
     dynamips_dir = project_root / "project-files" / "dynamips"
     if not dynamips_dir.exists():
-        raise FileNotFoundError(f"Dossier introuvable: {dynamips_dir}")
+        print(f"[WARN] Dossier introuvable, nettoyage ignoré: {dynamips_dir}")
+        return
 
     for router_dir in dynamips_dir.iterdir():
         if not router_dir.is_dir():
