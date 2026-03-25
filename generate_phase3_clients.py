@@ -77,6 +77,7 @@ def build_phase3_configs(intent: dict) -> dict[str, list[str]]:
                     f"  neighbor {allocation['ce_ip']} remote-as {ce_data['ce_as']}",
                     f"  neighbor {allocation['ce_ip']} activate",
                     f"  neighbor {allocation['ce_ip']} send-community both",
+                    f"  network {allocation['subnet'].network_address} mask {allocation['mask']}",
                     " exit-address-family",
                 ]
             )
