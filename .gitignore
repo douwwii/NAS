@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 project-files/dynamips/
+generated_configs/
+projet_NAS_GNS/

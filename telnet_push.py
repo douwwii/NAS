@@ -215,6 +215,50 @@ def push_config_lines(session: telnetlib.Telnet, router_name: str, lines: list[s
             tn_drain(session, 0.25)
 
 
+def read_until_prompt(session: telnetlib.Telnet, timeout: float = 10.0) -> bytes:
+    end_time = time.time() + timeout
+    buffer = b""
+    while time.time() < end_time:
+        try:
+            chunk = session.read_very_eager()
+        except EOFError:
+            break
+        if chunk:
+            buffer += chunk
+            if get_last_prompt_line(buffer):
+                return buffer
+        else:
+            time.sleep(0.05)
+    raise RuntimeError("Timed out while waiting for prompt")
+
+
+def strip_show_command_output(buffer: bytes, command: str) -> str:
+    text = buffer.decode("utf-8", errors="replace").replace("\r", "")
+    lines = text.splitlines()
+
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    if lines and lines[0].strip() == command:
+        lines.pop(0)
+    while lines and not lines[-1].strip():
+        lines.pop()
+    if lines and lines[-1].strip().endswith(("#", ">")):
+        lines.pop()
+
+    return "\n".join(lines).strip()
+
+
+def run_show_command(
+    session: telnetlib.Telnet,
+    command: str,
+    timeout: float = 12.0,
+) -> str:
+    tn_drain(session, 0.3)
+    send_line(session, command)
+    buffer = read_until_prompt(session, timeout=timeout)
+    return strip_show_command_output(buffer, command)
+
+
 def handle_save_prompts(session: telnetlib.Telnet, router_name: str, timeout: float = 10.0) -> None:
     start_time = time.time()
     buffer = b""
@@ -245,6 +289,28 @@ def connect_privileged(host: str, port: int, router_name: str, enable_password: 
     ensure_privileged(session, router_name, enable_password=enable_password)
     calm_console_spam(session, router_name)
     return session
+
+
+def fetch_running_config(
+    router_name: str,
+    project_path: Path | None = None,
+    host: str = DEFAULT_TELNET_HOST,
+    enable_password: str = "",
+) -> str:
+    project = project_path or DEFAULT_PROJECT
+    if project is None:
+        raise FileNotFoundError("No .gns3 project found in the current directory")
+    port = router_console(project, router_name)
+    session = None
+    try:
+        session = connect_privileged(host, port, router_name, enable_password=enable_password)
+        return run_show_command(session, "show running-config", timeout=20.0)
+    finally:
+        if session is not None:
+            try:
+                session.close()
+            except Exception:
+                pass
 
 
 def reset_router_runtime(
@@ -312,6 +378,43 @@ def deploy_with_retries(
     raise RuntimeError(f"{router_name}: all attempts failed. Last error: {last_error}")
 
 
+def apply_commands_with_retries(
+    host: str,
+    port: int,
+    router_name: str,
+    commands: list[str],
+    enable_password: str = "",
+    max_attempts: int = 6,
+) -> None:
+    last_error = None
+    for attempt in range(1, max_attempts + 1):
+        warmup = min(2.0 + attempt * 1.0, 10.0)
+        session = None
+        try:
+            log_router(router_name, f"Reconcile attempt {attempt}/{max_attempts}: connecting to {host}:{port}")
+            session = telnetlib.Telnet(host, port, timeout=20)
+            time.sleep(warmup)
+            tn_drain(session, 1.0)
+            wait_for_stable_prompt(session, router_name, timeout=18.0, require_twice=True)
+            ensure_privileged(session, router_name, enable_password=enable_password)
+            calm_console_spam(session, router_name)
+            push_config_lines(session, router_name, commands)
+            handle_save_prompts(session, router_name)
+            tn_drain(session, 0.8)
+            log_router(router_name, "RECONCILE DONE")
+            return
+        except Exception as exc:
+            last_error = exc
+            log_router(router_name, f"Reconcile attempt {attempt} FAILED: {exc}")
+        finally:
+            if session is not None:
+                try:
+                    session.close()
+                except Exception:
+                    pass
+    raise RuntimeError(f"{router_name}: reconcile failed. Last error: {last_error}")
+
+
 def router_console(project_path: Path, router_name: str) -> int:
     consoles = load_gns3_consoles(project_path)
     if router_name not in consoles:
@@ -350,6 +453,20 @@ def reset_router_before_push(
         raise FileNotFoundError("No .gns3 project found in the current directory")
     port = router_console(project, router_name)
     reset_router_runtime(host, port, router_name, enable_password=enable_password)
+
+
+def apply_router_commands(
+    router_name: str,
+    commands: list[str],
+    project_path: Path | None = None,
+    host: str = DEFAULT_TELNET_HOST,
+    enable_password: str = "",
+) -> None:
+    project = project_path or DEFAULT_PROJECT
+    if project is None:
+        raise FileNotFoundError("No .gns3 project found in the current directory")
+    port = router_console(project, router_name)
+    apply_commands_with_retries(host, port, router_name, commands, enable_password=enable_password)
 
 
 def main() -> None:

@@ -21,8 +21,8 @@
           "interface": "Loopback0",
           "type": "loopback",
           "ip": "10.255.255.1",
-          "mask": "255.255.255.252",
-          "network": "10.255.255.0/30"
+          "mask": "255.255.255.255",
+          "network": "10.255.255.1/32"
         },
         {
           "interface": "GigabitEthernet1/0",
@@ -59,9 +59,9 @@
         {
           "interface": "Loopback0",
           "type": "loopback",
-          "ip": "10.255.255.5",
-          "mask": "255.255.255.252",
-          "network": "10.255.255.4/30"
+          "ip": "10.255.255.2",
+          "mask": "255.255.255.255",
+          "network": "10.255.255.2/32"
         },
         {
           "interface": "GigabitEthernet1/0",
@@ -80,7 +80,7 @@
           "network": "10.0.0.4/30"
         }
       ],
-      "routeurID": "10.255.255.5"
+      "routeurID": "10.255.255.2"
     },
     "P2": {
       "role": "P",
@@ -88,9 +88,9 @@
         {
           "interface": "Loopback0",
           "type": "loopback",
-          "ip": "10.255.255.9",
-          "mask": "255.255.255.252",
-          "network": "10.255.255.8/30"
+          "ip": "10.255.255.3",
+          "mask": "255.255.255.255",
+          "network": "10.255.255.3/32"
         },
         {
           "interface": "GigabitEthernet1/0",
@@ -109,7 +109,7 @@
           "network": "10.0.0.8/30"
         }
       ],
-      "routeurID": "10.255.255.9"
+      "routeurID": "10.255.255.3"
     },
     "PE2": {
       "role": "PE",
@@ -117,9 +117,9 @@
         {
           "interface": "Loopback0",
           "type": "loopback",
-          "ip": "10.255.255.13",
-          "mask": "255.255.255.252",
-          "network": "10.255.255.12/30"
+          "ip": "10.255.255.4",
+          "mask": "255.255.255.255",
+          "network": "10.255.255.4/32"
         },
         {
           "interface": "GigabitEthernet1/0",
@@ -133,7 +133,7 @@
           "interface": "GigabitEthernet2/0",
           "type": "pe-ce",
           "peer": "CE2",
-          "vrf": "CUST1",
+          "vrf": "CUST2",
           "ip": "172.16.0.5",
           "mask": "255.255.255.252",
           "network": "172.16.0.4/30"
@@ -148,7 +148,7 @@
           "network": "172.16.0.12/30"
         }
       ],
-      "routeurID": "10.255.255.13"
+      "routeurID": "10.255.255.4"
     },
     "CE1": {
       "role": "CE",
@@ -157,8 +157,8 @@
           "interface": "Loopback0",
           "type": "loopback",
           "ip": "10.255.254.1",
-          "mask": "255.255.255.252",
-          "network": "10.255.254.0/30"
+          "mask": "255.255.255.255",
+          "network": "10.255.254.1/32"
         },
         {
           "interface": "GigabitEthernet1/0",
@@ -187,15 +187,15 @@
         {
           "interface": "Loopback0",
           "type": "loopback",
-          "ip": "10.255.254.5",
-          "mask": "255.255.255.252",
-          "network": "10.255.254.4/30"
+          "ip": "10.255.254.2",
+          "mask": "255.255.255.255",
+          "network": "10.255.254.2/32"
         },
         {
           "interface": "GigabitEthernet1/0",
           "type": "pe-ce",
           "peer": "PE2",
-          "vrf": "CUST1",
+          "vrf": "CUST2",
           "ip": "172.16.0.6",
           "mask": "255.255.255.252",
           "network": "172.16.0.4/30"
@@ -203,14 +203,14 @@
         {
           "interface": "GigabitEthernet2/0",
           "type": "customer-lan",
-          "customer": "CUST1",
-          "ip": "192.168.11.1",
+          "customer": "CUST2",
+          "ip": "192.168.19.1",
           "mask": "255.255.255.0",
-          "network": "192.168.11.0/24"
+          "network": "192.168.19.0/24"
         }
       ],
-      "customer": "CUST1",
-      "ce_as": 65102
+      "customer": "CUST2",
+      "ce_as": 65200
     },
     "CE3": {
       "role": "CE",
@@ -218,9 +218,9 @@
         {
           "interface": "Loopback0",
           "type": "loopback",
-          "ip": "10.255.254.9",
-          "mask": "255.255.255.252",
-          "network": "10.255.254.8/30"
+          "ip": "10.255.254.3",
+          "mask": "255.255.255.255",
+          "network": "10.255.254.3/32"
         },
         {
           "interface": "GigabitEthernet1/0",
@@ -249,9 +249,9 @@
         {
           "interface": "Loopback0",
           "type": "loopback",
-          "ip": "10.255.254.13",
-          "mask": "255.255.255.252",
-          "network": "10.255.254.12/30"
+          "ip": "10.255.254.4",
+          "mask": "255.255.255.255",
+          "network": "10.255.254.4/32"
         },
         {
           "interface": "GigabitEthernet1/0",
@@ -356,7 +356,7 @@
     {
       "type": "pe-ce",
       "link_id": 101,
-      "vrf": "CUST1",
+      "vrf": "CUST2",
       "network": "172.16.0.4/30",
       "endpoints": [
         {

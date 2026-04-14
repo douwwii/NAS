@@ -49,11 +49,11 @@ def wildcard_mask(network: ipaddress.IPv4Network) -> str:
 
 def loopback_ip(pool: str, index: int) -> tuple[str, str, str]:
     network = ipaddress.ip_network(pool)
-    subnets = list(network.subnets(new_prefix=30))
-    if index <= 0 or index > len(subnets):
+    hosts = list(network.hosts())
+    if index <= 0 or index > len(hosts):
         raise ValueError(f"Loopback index {index} is out of range for pool {pool}")
-    subnet = subnets[index - 1]
-    return host_ip(subnet, 1), render_mask(subnet), str(subnet)
+    address = str(hosts[index - 1])
+    return address, "255.255.255.255", f"{address}/32"
 
 
 def get_loopbacks(intent: dict) -> dict[str, dict]:
@@ -222,8 +222,6 @@ def build_visualization_intent(intent: dict) -> dict:
             visualization["routers"][router_name]["ce_as"] = router_data["ce_as"]
         if router_name in provider_loopbacks:
             visualization["routers"][router_name]["routeurID"] = provider_loopbacks[router_name]["ip"]
-        elif "routeurID" in router_data:
-            visualization["routers"][router_name]["routeurID"] = router_data["routeurID"]
 
     for router_name, loopback in provider_loopbacks.items():
         visualization["routers"][router_name]["addresses"].append(

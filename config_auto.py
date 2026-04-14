@@ -9,7 +9,15 @@ from generate_phase1_mpls import build_phase1_configs
 from generate_phase2_vpnv4 import build_phase2_configs
 from generate_phase3_clients import build_phase3_configs
 from gns3_runtime_clean import clean_dynamips_configs
-from telnet_push import DEFAULT_PROJECT, push_router_config, reset_router_before_push, router_console
+from reconcile_phase4a import build_reconcile_commands
+from telnet_push import (
+    DEFAULT_PROJECT,
+    apply_router_commands,
+    fetch_running_config,
+    push_router_config,
+    reset_router_before_push,
+    router_console,
+)
 
 
 PHASE_ORDER = [
@@ -178,6 +186,81 @@ def reset_pushable_routers(
             print(f"Failed reset {router_name}: {error}")
 
 
+def collect_running_configs(
+    router_names: list[str],
+    project_path: Path,
+    host: str,
+    enable_password: str,
+    workers: int,
+) -> dict[str, str]:
+    if not router_names:
+        return {}
+
+    phase_workers = resolved_workers(len(router_names), workers)
+    if phase_workers <= 1:
+        return {
+            router_name: fetch_running_config(router_name, project_path, host, enable_password)
+            for router_name in router_names
+        }
+
+    collected: dict[str, str] = {}
+    with ThreadPoolExecutor(max_workers=phase_workers) as executor:
+        future_map = {
+            executor.submit(fetch_running_config, router_name, project_path, host, enable_password): router_name
+            for router_name in router_names
+        }
+        for future in as_completed(future_map):
+            router_name = future_map[future]
+            collected[router_name] = future.result()
+    return collected
+
+
+def reconcile_phase4a(
+    project_path: Path,
+    host: str,
+    enable_password: str,
+    workers: int,
+    target: str,
+) -> None:
+    intent = load_intent()
+    target_routers = sorted(intent["routeurs"]) if target == "ALL" else [target]
+    pushable, skipped = pushable_routers({router_name: [] for router_name in target_routers}, project_path)
+    for router_name, reason in skipped:
+        print(f"Skipped {router_name} reconcile_phase4a: {reason}")
+
+    running_configs = collect_running_configs(pushable, project_path, host, enable_password, workers)
+    reconcile_commands = build_reconcile_commands(running_configs)
+    if target != "ALL":
+        reconcile_commands = {target: reconcile_commands.get(target, [])} if target in pushable else {}
+
+    write_router_configs(reconcile_commands, GENERATED_DIR, "reconcile_phase4a")
+    if not reconcile_commands:
+        print("Phase 4.a reconcile: no changes required")
+        return
+
+    router_names = sorted(reconcile_commands)
+    reconcile_workers = resolved_workers(len(router_names), workers)
+    if reconcile_workers > 1:
+        print(f"Parallel reconcile push: {reconcile_workers} workers")
+
+    results = run_parallel_router_jobs(
+        router_names,
+        reconcile_workers,
+        lambda router_name: apply_router_commands(
+            router_name,
+            reconcile_commands[router_name],
+            project_path,
+            host,
+            enable_password,
+        ),
+    )
+    for router_name, error in sorted(results, key=lambda item: item[0]):
+        if error is None:
+            print(f"Reconciled {router_name}")
+        else:
+            print(f"Failed reconcile {router_name}: {error}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate phased configs and optionally push them to GNS in validation order."
@@ -190,6 +273,10 @@ def main() -> None:
     parser.add_argument(
         "--push-full",
         help="Push the final full config of one router or ALL routers.",
+    )
+    parser.add_argument(
+        "--reconcile-phase4a",
+        help="Read current running-config and reconcile customer onboarding resources for one router or ALL routers.",
     )
     parser.add_argument(
         "--project",
@@ -217,7 +304,7 @@ def main() -> None:
     print(f"Generated phased and full configs in {GENERATED_DIR}")
 
     project_path = Path(args.project) if args.project else DEFAULT_PROJECT
-    if (args.push_phases or args.push_full) and project_path is None:
+    if (args.push_phases or args.push_full or args.reconcile_phase4a) and project_path is None:
         raise SystemExit("No .gns3 project found. Use --project.")
 
     if args.push_phases:
@@ -249,6 +336,9 @@ def main() -> None:
             router_console(project_path, args.push_full)
             push_router_config(args.push_full, "full", project_path, args.host, args.enable_pass)
             print(f"Pushed {args.push_full} full")
+
+    if args.reconcile_phase4a:
+        reconcile_phase4a(project_path, args.host, args.enable_pass, args.workers, args.reconcile_phase4a)
 
 
 if __name__ == "__main__":

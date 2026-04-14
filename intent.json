@@ -31,22 +31,18 @@
   "routeurs": {
     "PE1": {
       "role": "PE",
-      "routeurID": "10.255.255.1",
       "loopback_index": 1
     },
     "P1": {
       "role": "P",
-      "routeurID": "10.255.255.2",
       "loopback_index": 2
     },
     "P2": {
       "role": "P",
-      "routeurID": "10.255.255.3",
       "loopback_index": 3
     },
     "PE2": {
       "role": "PE",
-      "routeurID": "10.255.255.4",
       "loopback_index": 4
     },
 
@@ -58,8 +54,8 @@
     },
     "CE2": {
       "role": "CE",
-      "customer": "CUST1",
-      "ce_as": 65102,
+      "customer": "CUST2",
+      "ce_as": 65200,
       "ce_loopback_index": 2
     },
     "CE3": {
@@ -125,7 +121,7 @@
       "interface_b": "GigabitEthernet1/0",
       "link_id": 101,
       "type": "pe-ce",
-      "vrf": "CUST1",
+      "vrf": "CUST2",
       "routing": "ebgp"
     },
     {
@@ -169,14 +165,14 @@
         "ce": "CE1",
         "lan_prefix": "192.168.10.0/24",
         "lan_interface": "GigabitEthernet2/0"
-      },
-      {
-        "ce": "CE2",
-        "lan_prefix": "192.168.11.0/24",
-        "lan_interface": "GigabitEthernet2/0"
       }
     ],
     "CUST2": [
+      {
+        "ce": "CE2",
+        "lan_prefix": "192.168.19.0/24",
+        "lan_interface": "GigabitEthernet2/0"
+      },
       {
         "ce": "CE3",
         "lan_prefix": "192.168.20.0/24",
